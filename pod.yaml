@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: reader
+  labels:
+    app: clickhouse-mysql-reader
+spec:
+  containers:
+    - name: reader
+      image: us.gcr.io/development-228621/clickhouse-mysql-reader:master
+      command: ["sh"]
+      stdin: true
