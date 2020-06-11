@@ -7,6 +7,6 @@ metadata:
 spec:
   containers:
     - name: reader
-      image: us.gcr.io/development-228621/clickhouse-mysql-reader:master
+      image: us.gcr.io/development-228621/clickhouse-mysql-reader:latest
       command: ["sh"]
       stdin: true
