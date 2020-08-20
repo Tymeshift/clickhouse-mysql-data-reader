@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: reader-job-{ACCOUNT_ID}
+  name: reader-job-{NAME}
 spec:
   template:
     spec:
@@ -14,7 +14,7 @@ spec:
             "--src-host=35.192.162.222",
             "--src-user=root",
             "--src-password=Mister007",
-            "--src-tables=tymeapp_tymeshift.temp_audit_events_for_account_id_{ACCOUNT_ID}",
+            "--src-tables={TABLES}",
             "--dst-host=clickhouse-ch-pods.ch-storage-dev.svc.cluster.local",
             "--dst-user=admin",
             "--dst-password=clickhouse",

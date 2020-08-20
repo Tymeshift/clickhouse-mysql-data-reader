@@ -1,53 +1,34 @@
 <?php
-$accounts = [
-    35063,
-    15761,
-    21853,
-    8351,
-    15051,
-    43343,
-    19773,
-    37493,
-    34433,
-    21003,
-    45903,
-    37383,
-    37543,
-    1606,
-    34483,
-    25383,
-    25943,
-    11661,
-    27163,
-    37673,
-    23103,
-    27983,
-    15551,
-    6251,
-    20573,
-    14681,
-    6811,
-    31013,
-    32053,
-    35213,
-    38653,
-    25293,
-    28013,
-    23733,
-    50303,
-    9151,
-    36203,
-    29203,
-    47733,
-    27113,
-    49343,
-    36603,
-    34073,
-    12051,
-    30193
-];
+$mysqli = new mysqli("35.232.137.29", "root", "Mister007", "tymeapp_tymeshift");
+$stringTemplate = "tymeapp_tymeshift.temp_audit_events_for_account_id_";
+
+/* check connection */
+if ($mysqli->connect_errno) {
+    printf("Connect failed: %s\n", $mysqli->connect_error);
+    exit();
+}
+
+$query = "SELECT SUBSTRING_INDEX(TABLE_NAME,'id_',-1) FROM information_schema.tables where table_name LIKE 'temp_audit_events_for_account_id_%';";
+$result = $mysqli->query($query);
+
+/* numeric array */
+$accounts = $result->fetch_all();
+
+$total = $result->num_rows;
+$jobSize = $total / 4;
 $file = file_get_contents('./job.yaml');
-foreach ($accounts as $accountID) {
-    $changed = preg_replace('/\{.*\}/', $accountID, $file);
-    file_put_contents("job-$accountID.yaml", $changed);
+$targetTables = [];
+$ids = [];
+foreach ($accounts as $key => $accountID) {
+    $targetTables[] = $stringTemplate.$accountID[0];
+    $ids[] = $accountID[0];
+    if(count($targetTables) >= $jobSize || $key == $total - 1) {
+        $id = $accountID[0];
+        $changed = preg_replace('/\{TABLES\}/', implode(",", $targetTables), $file);
+        $changed = preg_replace('/\{NAME\}/', $id, $changed);
+        file_put_contents("ids-$id.txt", implode(",", $ids));
+        file_put_contents("job-$id.yaml", $changed);
+        $targetTables = [];
+        $ids = [];
+    }
 }
